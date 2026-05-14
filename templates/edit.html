@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Libro</title>
+</head>
+<body>
+    <h2>Editar libro</h2>
+
+<form method="POST">
+    <input name="title" value="{{ book.title }}"><br><br>
+    <input name="author" value="{{ book.author }}"><br><br>
+    <input name="stock" type="number" value="{{ book.stock }}"><br><br>
+    <input name="price" type="number" step="0.01" value="{{ book.price }}"><br><br>
+    <label for="status">Estatus:</label>
+    <select name="status" id="status">
+        <option value="True" {% if book.status %}selected{% endif %}>Disponible</option>
+        <option value="False" {% if not book.status %}selected{% endif %}>No disponible</option>
+    </select><br><br>
+    <button type="submit">Actualizar</button>
+</form>
+</body>
+</html>

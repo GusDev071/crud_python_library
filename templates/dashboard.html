@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h2>Bienvenido, {{ session['user'] }}! a tu panel de control</h2>
+    <a href="/create">Crear nuevo libro</a>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Autor</th>
+            <th>Stock</th>
+            <th>Estatus</th>
+            <th>Precio</th>
+            <th>Acciones</th>
+        </tr>
+        {% for book in books %}
+        <tr>
+            <td>{{book.id}}</td>
+            <td>{{book.title}}</td>
+            <td>{{book.author}}</td>
+            <td>{{book.stock}}</td>
+            <td>{{book.status}}</td>
+            <td>{{book.price}}</td>
+            <td>
+                <a href="/edit/{{book.id}}">editar</a>
+                <a href="/delete/{{book.id}}">eliminar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+        
+    
+</body>
+</html>

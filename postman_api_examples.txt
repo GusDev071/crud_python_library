@@ -1,0 +1,286 @@
+POSTMAN API EXAMPLES - CRUD_PYTHON
+
+Base URL:
+http://127.0.0.1:5000
+
+Importante:
+1) Levantar servidor con: python run.py
+2) En Postman usa Body -> raw -> JSON para rutas POST, PUT y PATCH
+3) Para rutas protegidas usar header Authorization: Bearer <TOKEN>
+
+--------------------------------------------------
+1) Health Check (sin token)
+--------------------------------------------------
+GET /api/health
+URL: http://127.0.0.1:5000/api/health
+
+Respuesta esperada (200):
+{
+  "message": "API funcionando"
+}
+
+--------------------------------------------------
+2) Registro de usuario (sin token)
+--------------------------------------------------
+POST /api/auth/register
+URL: http://127.0.0.1:5000/api/auth/register
+Headers:
+- Content-Type: application/json
+Body:
+{
+  "username": "gustavo",
+  "password": "123456"
+}
+
+Respuesta esperada (201):
+{
+  "message": "Usuario creado",
+  "user": {
+    "id": 1,
+    "username": "gustavo"
+  }
+}
+
+Errores comunes:
+- 400: {"error": "El body debe ser JSON"}
+- 400: {"error": "username y password son requeridos"}
+- 409: {"error": "El usuario ya existe"}
+
+--------------------------------------------------
+3) Login y obtención de JWT (sin token)
+--------------------------------------------------
+POST /api/auth/login
+URL: http://127.0.0.1:5000/api/auth/login
+Headers:
+- Content-Type: application/json
+Body:
+{
+  "username": "gustavo",
+  "password": "123456"
+}
+
+Respuesta esperada (200):
+{
+  "message": "Login correcto",
+  "access_token": "TOKEN_JWT_AQUI",
+  "token_type": "Bearer",
+  "sessionStartedAt": "2026-04-22T19:30:00Z",
+  "sessionExpiresAt": "2026-04-22T20:30:00Z",
+  "user": {
+    "id": 1,
+    "username": "gustavo"
+  }
+}
+
+Errores comunes:
+- 400: {"error": "El body debe ser JSON"}
+- 400: {"error": "username y password son requeridos"}
+- 401: {"error": "Credenciales inválidas"}
+
+--------------------------------------------------
+4) Ver usuario del token (requiere token)
+--------------------------------------------------
+GET /api/auth/me
+URL: http://127.0.0.1:5000/api/auth/me
+Headers:
+- Authorization: Bearer TOKEN_JWT_AQUI
+
+Respuesta esperada (200):
+{
+  "data": {
+    "id": 1,
+    "username": "gustavo"
+  }
+}
+
+Errores comunes:
+- 401: {"error": "Token requerido"}
+- 401: {"error": "Token inválido"}
+- 401: {"error": "Token expirado"}
+
+--------------------------------------------------
+5) Subir imagen Data URI (requiere token)
+--------------------------------------------------
+POST /api/uploads/image
+URL: http://127.0.0.1:5000/api/uploads/image
+Headers:
+- Content-Type: application/json
+- Authorization: Bearer TOKEN_JWT_AQUI
+Body:
+{
+  "imageDataUri": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+}
+
+Respuesta esperada (201):
+{
+  "message": "Imagen subida",
+  "data": {
+    "filename": "img_20260427124510_abc123def0.png",
+    "public_url": "http://127.0.0.1:5000/public/storage/img_20260427124510_abc123def0.png"
+  }
+}
+
+Notas:
+- También acepta logoDataUri como alias.
+- Formatos permitidos: png, jpg, jpeg, webp, gif.
+- URL pública servida por el backend en /public/storage/<filename>.
+
+--------------------------------------------------
+6) Listar libros (requiere token)
+--------------------------------------------------
+GET /api/books
+URL: http://127.0.0.1:5000/api/books
+Headers:
+- Authorization: Bearer TOKEN_JWT_AQUI
+
+Respuesta esperada (200):
+{
+  "data": [
+    {
+      "id": 1,
+      "title": "Clean Code",
+      "author": "Robert C. Martin",
+      "stock": 10,
+      "price": 25.5,
+      "status": true,
+      "image_url": "http://127.0.0.1:5000/public/storage/img_20260427124510_abc123def0.png"
+    }
+  ]
+}
+
+--------------------------------------------------
+7) Obtener libro por ID (requiere token)
+--------------------------------------------------
+GET /api/books/1
+URL: http://127.0.0.1:5000/api/books/1
+Headers:
+- Authorization: Bearer TOKEN_JWT_AQUI
+
+Respuesta esperada (200):
+{
+  "data": {
+    "id": 1,
+    "title": "Clean Code",
+    "author": "Robert C. Martin",
+    "stock": 10,
+    "price": 25.5,
+    "status": true,
+    "image_url": "http://127.0.0.1:5000/public/storage/img_20260427124510_abc123def0.png"
+  }
+}
+
+Errores comunes:
+- 404: {"error": "The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again."}
+
+--------------------------------------------------
+8) Crear libro (requiere token)
+--------------------------------------------------
+POST /api/books
+URL: http://127.0.0.1:5000/api/books
+Headers:
+- Content-Type: application/json
+- Authorization: Bearer TOKEN_JWT_AQUI
+Body:
+{
+  "title": "The Pragmatic Programmer",
+  "author": "Andrew Hunt",
+  "stock": 7,
+  "price": 30.0,
+  "status": true,
+  "imageDataUri": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+}
+
+Respuesta esperada (201):
+{
+  "message": "Libro creado",
+  "data": {
+    "id": 2,
+    "title": "The Pragmatic Programmer",
+    "author": "Andrew Hunt",
+    "stock": 7,
+    "price": 30.0,
+    "status": true,
+    "image_url": "http://127.0.0.1:5000/public/storage/img_20260427124510_abc123def0.png"
+  }
+}
+
+Errores comunes:
+- 400: {"error": "El body debe ser JSON"}
+- 400: {"error": "title y author son requeridos"}
+- 400: {"error": "stock debe ser entero y price numérico"}
+
+--------------------------------------------------
+9) Actualizar libro completo (requiere token)
+--------------------------------------------------
+PUT /api/books/2
+URL: http://127.0.0.1:5000/api/books/2
+Headers:
+- Content-Type: application/json
+- Authorization: Bearer TOKEN_JWT_AQUI
+Body:
+{
+  "title": "The Pragmatic Programmer 20th",
+  "author": "Andrew Hunt",
+  "stock": 9,
+  "price": 35.5,
+  "status": true,
+  "logoDataUri": "data:image/webp;base64,UklGRiIAAABXRUJQVlA4..."
+}
+
+Respuesta esperada (200):
+{
+  "message": "Libro actualizado",
+  "data": {
+    "id": 2,
+    "title": "The Pragmatic Programmer 20th",
+    "author": "Andrew Hunt",
+    "stock": 9,
+    "price": 35.5,
+    "status": true,
+    "image_url": "http://127.0.0.1:5000/public/storage/img_20260427124510_abc123def0.webp"
+  }
+}
+
+--------------------------------------------------
+10) Actualizar libro parcial (requiere token)
+--------------------------------------------------
+PATCH /api/books/2
+URL: http://127.0.0.1:5000/api/books/2
+Headers:
+- Content-Type: application/json
+- Authorization: Bearer TOKEN_JWT_AQUI
+Body:
+{
+  "price": 38.0,
+  "status": false,
+  "imageDataUri": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD..."
+}
+
+Errores comunes:
+- 400: {"error": "Debes enviar al menos un campo para actualizar"}
+- 400: {"error": "price debe ser numérico"}
+- 400: {"error": "stock debe ser entero"}
+
+--------------------------------------------------
+11) Eliminar libro (requiere token)
+--------------------------------------------------
+DELETE /api/books/2
+URL: http://127.0.0.1:5000/api/books/2
+Headers:
+- Authorization: Bearer TOKEN_JWT_AQUI
+
+Respuesta esperada (200):
+{
+  "message": "Libro eliminado"
+}
+
+--------------------------------------------------
+Guía rápida de códigos HTTP usados
+--------------------------------------------------
+200 OK: solicitud correcta
+201 Created: recurso creado
+400 Bad Request: datos inválidos o body incorrecto
+401 Unauthorized: token o credenciales inválidas
+404 Not Found: recurso no existe
+409 Conflict: conflicto de datos (ejemplo: usuario duplicado)
+500 Internal Server Error: error no controlado
